@@ -48,12 +48,13 @@ func main() {
 	nodes[ignore] = true
 
 	//Listen for the connection
-	go listenConn()
+	go ListenConn()
 
 	for {
+		// replace this with talking to registry node
 		for port := 7000; port <= 7001; port++ {
 			if !nodes[port] {
-				fmt.Println("Checking...")
+				// fmt.Println("Checking...")
 				sPort := strconv.Itoa(port)
 				conn, _ := net.Dial("tcp", "127.0.0.1:"+sPort)
 				if conn != nil {
@@ -63,7 +64,7 @@ func main() {
 					nodes[port] = true
 
 					conn.Write([]byte("connect " + strconv.Itoa(ignore)))
-					go handleConn(conn)
+					go HandleConn(conn)
 				}
 			}
 			time.Sleep(100 * time.Millisecond)
@@ -71,26 +72,7 @@ func main() {
 	}
 }
 
-func listenConn() {
-	portString := ":" + os.Getenv("PORT")
-	listen, err := net.Listen("tcp", portString)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer listen.Close()
-
-	for {
-		conn, err := listen.Accept()
-		if err != nil {
-			log.Fatal(err)
-		}
-		go handleConn(conn)
-	}
-}
-
-func handleConn(conn net.Conn) {
+func HandleConn(conn net.Conn) {
 	defer conn.Close()
 
 	var buf [256]byte
